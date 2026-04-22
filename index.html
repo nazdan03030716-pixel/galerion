@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ArtSpace Gallery</title>
+    <link rel="stylesheet" href="./stile.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>ArtSpace — онлайн галерея</h1>
+    </header>
+
+    <main>
+
+        <!-- 1. ЗАГРУЗКА -->
+        <section>
+            <input type="file" id="uploadInput" accept="image/*">
+
+            <select id="genreSelect">
+                <option value="abstract">Абстракция</option>
+                <option value="portrait">Портрет</option>
+                <option value="landscape">Пейзаж</option>
+                <option value="ai">AI-арт</option>
+                <option value="other">Другое</option>
+            </select>
+
+            <button onclick="addImage()">Загрузить</button>
+        </section>
+
+        <!-- 2. DRAG & DROP -->
+        <section>
+            <div id="dropZone">
+                Перетащи сюда изображение
+            </div>
+        </section>
+
+        <!-- 3. ФИЛЬТР -->
+        <section>
+            <select id="filterMode">
+                <option value="include">Показывать выбранное</option>
+                <option value="exclude">Исключить выбранное</option>
+            </select>
+
+            <select id="genreFilter">
+                <option value="all">Все жанры</option>
+                <option value="abstract">Абстракция</option>
+                <option value="portrait">Портрет</option>
+                <option value="landscape">Пейзаж</option>
+                <option value="ai">AI-арт</option>
+                <option value="other">Другое</option>
+            </select>
+
+            <button onclick="renderGallery()">Применить фильтр</button>
+        </section>
+
+        <!-- ГАЛЕРЕЯ -->
+        <section>
+            <div id="gallery"></div>
+        </section>
+
+    </main>
+
+    <script src="./script.js"></script>
+
+</body>
+
+</html>
