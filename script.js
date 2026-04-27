@@ -1,27 +1,30 @@
 // ===============================
-// ХРАНЕНИЕ И ЗАГРУЗКА ДАННЫХ
+// SUPABASE ПОДКЛЮЧЕНИЕ
 // ===============================
 
-function getImages() {
-    return JSON.parse(localStorage.getItem("images")) || [];
-}
+const supabaseUrl = "https://aoaafscgnmtnszopfzaj.supabase.co";
+const supabaseKey = "sb_publishable_PtVopmK_oo3mbp2Ev5QUxQ_BF8XGFDp";
 
-function saveImages(images) {
-    localStorage.setItem("images", JSON.stringify(images));
-}
+// создаём клиент нормально, без магии и саморазрушения
+const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+
 
 // ===============================
-// ОСНОВНАЯ ФУНКЦИЯ ДОБАВЛЕНИЯ
+// ДОБАВЛЕНИЕ ИЗОБРАЖЕНИЯ
 // ===============================
 
-function handleFile(file, genre = "other") {
-    if (!file) return;
+async function handleFile(file, genre = "other") {
+    if (!file) {
+        alert("Выберите файл.");
+        return;
+    }
 
     const validTypes = [
         "image/jpeg",
         "image/png",
         "image/webp",
-        "image/gif"
+        "image/gif",
+        "image/jpg"
     ];
 
     if (!validTypes.includes(file.type)) {
@@ -31,20 +34,30 @@ function handleFile(file, genre = "other") {
 
     const reader = new FileReader();
 
-    reader.onload = function (event) {
-        const images = getImages();
+    reader.onload = async function (event) {
+        const base64Image = event.target.result;
 
-        images.push({
-            image: event.target.result,
-            genre: genre
-        });
+        const { error } = await client
+            .from("image")
+            .insert([
+                {
+                    image: base64Image,
+                    genre: genre
+                }
+            ]);
 
-        saveImages(images);
+        if (error) {
+            console.error("Ошибка загрузки:", error);
+            alert("Не удалось загрузить изображение.");
+            return;
+        }
+
         renderGallery();
     };
 
     reader.readAsDataURL(file);
 }
+
 
 // ===============================
 // КНОПКА ЗАГРУЗКИ
@@ -56,47 +69,75 @@ function addImage() {
 
     const file = input.files[0];
     handleFile(file, genre);
+
+    input.value = "";
 }
 
+
 // ===============================
-// ОТОБРАЖЕНИЕ ГАЛЕРЕИ
+// ЗАГРУЗКА ГАЛЕРЕИ
 // ===============================
 
-function renderGallery(filter = "all") {
+async function renderGallery() {
     const gallery = document.getElementById("gallery");
     gallery.innerHTML = "";
 
-    const images = getImages();
+    const { data, error } = await client
+        .from("image")
+        .select("*")
+        .order("id", { ascending: false });
 
-    images.forEach((img, index) => {
+    if (error) {
+        console.error("Ошибка загрузки галереи:", error);
+        return;
+    }
 
-        if (filter !== "all" && img.genre !== filter) return;
+    const filterMode = document.getElementById("filterMode").value;
+    const genreFilter = document.getElementById("genreFilter").value;
 
+    let filteredData = data;
+
+    if (genreFilter !== "all") {
+        if (filterMode === "include") {
+            filteredData = data.filter(img => img.genre === genreFilter);
+        } else {
+            filteredData = data.filter(img => img.genre !== genreFilter);
+        }
+    }
+
+    filteredData.forEach((img) => {
         const card = document.createElement("div");
         card.className = "card";
 
         card.innerHTML = `
-            <img src="${img.image}">
+            <img src="${img.image}" alt="image">
             <p>${img.genre}</p>
-            <button onclick="deleteImage(${index})">Удалить</button>
+            <button onclick="deleteImage(${img.id})">Удалить</button>
         `;
 
         gallery.appendChild(card);
     });
 }
 
+
 // ===============================
 // УДАЛЕНИЕ
 // ===============================
 
-function deleteImage(index) {
-    const images = getImages();
+async function deleteImage(id) {
+    const { error } = await client
+        .from("image")
+        .delete()
+        .eq("id", id);
 
-    images.splice(index, 1);
+    if (error) {
+        console.error("Ошибка удаления:", error);
+        return;
+    }
 
-    saveImages(images);
     renderGallery();
 }
+
 
 // ===============================
 // DRAG & DROP
@@ -124,13 +165,6 @@ dropZone.addEventListener("drop", (e) => {
     }
 });
 
-// ===============================
-// ФИЛЬТР (если есть кнопки)
-// ===============================
-
-function filterGallery(genre) {
-    renderGallery(genre);
-}
 
 // ===============================
 // ПЕРВЫЙ ЗАПУСК
