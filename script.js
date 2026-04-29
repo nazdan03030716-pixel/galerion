@@ -3,10 +3,10 @@
 // ===============================
 
 const supabaseUrl = "https://aoaafscgnmtnszopfzaj.supabase.co";
-const supabaseKey = "sb_publishable_PtVopmK_oo3mbp2Ev5QUxQ_BF8XGFDp";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvYWFmc2Nnbm10bnN6b3BmemFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMDA2MjUsImV4cCI6MjA5Mjc3NjYyNX0.YeWJLDn7sSnlI5lqgrbP6HynMF2qi4Cq-hiPACaDXfk";
 
 // создаём клиент нормально, без магии и саморазрушения
-const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+const client = supabase.createClient(supabaseUrl, supabaseKey);
 
 
 // ===============================
@@ -42,7 +42,8 @@ async function handleFile(file, genre = "other") {
             .insert([
                 {
                     image: base64Image,
-                    genre: genre
+                    genre: genre,
+                    title: file.name
                 }
             ]);
 
