@@ -4,8 +4,6 @@
 
 const supabaseUrl = "https://aoaafscgnmtnszopfzaj.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvYWFmc2Nnbm10bnN6b3BmemFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMDA2MjUsImV4cCI6MjA5Mjc3NjYyNX0.YeWJLDn7sSnlI5lqgrbP6HynMF2qi4Cq-hiPACaDXfk";
-
-// создаём клиент нормально, без магии и саморазрушения
 const client = supabase.createClient(supabaseUrl, supabaseKey);
 
 
